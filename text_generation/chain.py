@@ -1,7 +1,6 @@
 from langchain.prompts import PromptTemplate
 from langchain_community.llms import YandexGPT
 from langchain.output_parsers import CommaSeparatedListOutputParser
-from langchain.callbacks.base import BaseCallbackHandler
 from langchain_core.messages import AIMessage
 import os
 import yaml
