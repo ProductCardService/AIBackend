@@ -1,5 +1,5 @@
 from langchain.prompts import PromptTemplate
-from langchain_community.llms import YandexGPT
+from langchain_community.llms import GigaChat
 from langchain.output_parsers import CommaSeparatedListOutputParser
 from langchain_core.messages import AIMessage
 import os
@@ -7,8 +7,7 @@ import yaml
 from dotenv import load_dotenv
 
 load_dotenv()
-API_KEY = os.getenv("API_KEY")
-FOLDER_ID = os.getenv("FOLDER_ID")
+GIGACHAT_CREDENTIALS = os.getenv("GIGACHAT_CREDENTIALS")
 
 script_dir = os.path.dirname(__file__)
 prompts_path = os.path.join(script_dir, 'prompts.yaml')
@@ -25,11 +24,9 @@ def parse(ai_message: AIMessage) -> str:
     """Parse the AI message."""
     return ai_message.rstrip('.').lower()
 
-model = YandexGPT(
-    api_key=API_KEY, 
-    folder_id=FOLDER_ID, 
-    temperature=0, 
-    model_name='yandexgpt'
+model = GigaChat(
+    credentials=GIGACHAT_CREDENTIALS, 
+    verify_ssl_certs=False
 )
 
 food_chain = FOOD_TEMPLATE | model | parse | output_parser
