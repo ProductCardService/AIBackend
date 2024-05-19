@@ -17,8 +17,6 @@ from uuid import uuid4
 
 load_dotenv()
 
-unique_id = uuid4().hex[0:8]
-
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_PROJECT"] = "fitcha"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
