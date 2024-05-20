@@ -3,7 +3,6 @@ import time
 import json
 import yaml
 import requests
-from uuid import uuid4
 import re
 
 from dotenv import load_dotenv
@@ -11,8 +10,6 @@ from dotenv import load_dotenv
 from langchain_core.messages import AIMessage
 from langchain.output_parsers import CommaSeparatedListOutputParser
 from langchain_core.output_parsers.base import BaseOutputParser
-from langchain.callbacks.base import BaseCallbackHandler
-from langchain_community.llms import YandexGPT
 from langchain_community.llms import GigaChat
 from langchain.prompts import PromptTemplate
 
