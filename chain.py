@@ -1,28 +1,23 @@
-from langchain.prompts import PromptTemplate
-from langchain_community.llms import YandexGPT
-from langchain_community.llms import GigaChat
-from langchain.output_parsers import CommaSeparatedListOutputParser
-from langchain.callbacks.base import BaseCallbackHandler
-from langchain_core.messages import AIMessage
-from langchain_core.output_parsers.base import BaseOutputParser
-import re
 import os
+import time
 import json
 import yaml
-import time
 import requests
+from uuid import uuid4
+import re
+
 from dotenv import load_dotenv
 
-from uuid import uuid4
+from langchain_core.messages import AIMessage
+from langchain.output_parsers import CommaSeparatedListOutputParser
+from langchain_core.output_parsers.base import BaseOutputParser
+from langchain.callbacks.base import BaseCallbackHandler
+from langchain_community.llms import YandexGPT
+from langchain_community.llms import GigaChat
+from langchain.prompts import PromptTemplate
 
 load_dotenv()
 
-os.environ["LANGCHAIN_TRACING_V2"] = "true"
-os.environ["LANGCHAIN_PROJECT"] = "fitcha"
-os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
-
-API_KEY = os.getenv("API_KEY")
-FOLDER_ID = os.getenv("FOLDER_ID")
 GIGACHAT_CREDENTIALS = os.getenv("GIGACHAT_CREDENTIALS")
 KANDINSKY_API_KEY = os.getenv('KANDINSKY_API_KEY')
 KANDINSKY_SECRET_KEY = os.getenv('KANDINSKY_SECRET_KEY')
@@ -124,7 +119,7 @@ model_pro = GigaChat(
     verify_ssl_certs=False
 )
 
-tags_chain = TAGS_TEMPLATE | model_lite | parse
+tags_chain = TAGS_TEMPLATE | model_pro | parse | output_parser
 description_chain = DESCRIPTION_TEMPLATE | model_lite | new_line_output_parser
 food_chain = FOOD_TEMPLATE | model_lite | parse | output_parser
 image_chain = IMAGE_TEMPLATE | model_lite | get_img
