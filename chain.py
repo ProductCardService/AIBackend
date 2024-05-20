@@ -37,11 +37,12 @@ IMAGE_TEMPLATE = PromptTemplate.from_template(prompts['image'])
 
 class NewlineOutputParser(BaseOutputParser):
     def parse(self, text: str) -> list:
-        return re.split(r'\n', text.strip())
+        lines = re.split(r'\n', text.strip())
+        return [line.replace('\\n', '') for line in lines]
 
     def get_format_instructions(self) -> str:
         return "The answer should be in the form of a list, with each element separated by a line break."
-
+    
 def parse(ai_message: AIMessage) -> str:
     """Parse the AI message."""
     return ai_message.rstrip('.').lower()
