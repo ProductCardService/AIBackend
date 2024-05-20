@@ -6,15 +6,15 @@ app = FastAPI(title="Product Card Service App")
 
 @app.get("/generate/descriptions")
 async def message(title: str):
-    description = description_chain.invoke({"title": title})
+    descriptions = description_chain.invoke({"title": title})
 
-    return description
+    return {"descriptions": descriptions}
 
 @app.get("/generate/tags")
 async def message(title: str):
     tags = tags_chain.invoke({"title": title})
 
-    return tags
+    return {"tags": tags}
 
 @app.get("/generate/images")
 async def message(title: str):
@@ -23,7 +23,7 @@ async def message(title: str):
     for food in food_list:
         images.append(image_chain.invoke({"title": food}))
 
-    return images
+    return {"images": images}
 
 if __name__ == "__main__":
     import uvicorn
