@@ -19,8 +19,15 @@ app = FastAPI(title="Product Card Service App")
 async def get_descriptions(pinput: PredictionInput):
     title = pinput.title
     descriptions = description_chain.invoke({"title": title})
-
-    return {"descriptions": descriptions}
+    cleaned_descriptions = []
+    for description in descriptions:
+        if description == "": # to avoid empty generation
+            continue
+        new_description = description
+        if description[:1].isdigit():
+            new_description = description[3:]
+        cleaned_descriptions.append(new_description)
+    return {"descriptions": cleaned_descriptions + ["", "", "", ""]} # if no generations
 
 @app.post("/generate/tags")
 async def get_tags(pinput: PredictionInput):
