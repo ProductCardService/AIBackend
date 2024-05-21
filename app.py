@@ -6,24 +6,32 @@ from chain import (
     image_chain, 
     food_chain
 )
+from pydantic import BaseModel
+
+
+class PredictionInput(BaseModel):
+    title: str
 
 app = FastAPI(title="Product Card Service App")
 
 
-@app.get("/generate/descriptions")
-async def get_descriptions(title: str):
+@app.post("/generate/descriptions")
+async def get_descriptions(pinput: PredictionInput):
+    title = pinput.title
     descriptions = description_chain.invoke({"title": title})
 
     return {"descriptions": descriptions}
 
-@app.get("/generate/tags")
-async def get_tags(title: str):
+@app.post("/generate/tags")
+async def get_tags(pinput: PredictionInput):
+    title = pinput.title
     tags = tags_chain.invoke({"title": title})
 
     return {"tags": tags}
 
-@app.get("/generate/images")
-async def get_images(title: str):
+@app.post("/generate/images")
+async def get_images(pinput: PredictionInput):
+    title = pinput.title
     images = []
     food_list = food_chain.invoke({"title": title})
     tasks = [image_chain.ainvoke({"title": food}) for food in food_list]    
