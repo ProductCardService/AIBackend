@@ -20,8 +20,8 @@ async def get_descriptions(pinput: PredictionInput):
     title = pinput.title
     descriptions = description_chain.invoke({"title": title})
     cleaned_descriptions = []
-    for description in descriptions:
-        if description == "": # to avoid empty generation
+    for description in descriptions[1:]: # skip first general message (non informative)
+        if description == "": # skip empty generation
             continue
         new_description = description
         if description[:1].isdigit():
