@@ -18,16 +18,17 @@ app = FastAPI(title="Product Card Service App")
 @app.post("/generate/descriptions")
 async def get_descriptions(pinput: PredictionInput):
     title = pinput.title
-    descriptions = description_chain.invoke({"title": title})
-    cleaned_descriptions = []
-    for description in descriptions[1:]: # skip first general message (non informative)
-        if description == "": # skip empty generation
-            continue
-        new_description = description
-        if description[:1].isdigit():
-            new_description = description[3:]
-        cleaned_descriptions.append(new_description)
-    return {"descriptions": cleaned_descriptions + ["", "", "", ""]} # if no generations
+    num_attempts = 3
+    for _ in range(num_attempts):
+        try:
+            descriptions = description_chain.invoke({"title": title})
+            break
+        except Exception as e:
+            pass
+    else:
+        raise Exception("All attempts failed to execute the code")
+
+    return {"descriptions": descriptions}
 
 @app.post("/generate/tags")
 async def get_tags(pinput: PredictionInput):

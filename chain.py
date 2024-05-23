@@ -34,8 +34,20 @@ IMAGE_TEMPLATE = PromptTemplate.from_template(prompts['image'])
 
 class NewlineOutputParser(BaseOutputParser):
     def parse(self, text: str) -> list:
-        lines = re.split(r'\n', text.strip())
-        return [line.replace('\\n', '') for line in lines]
+        if text.endswith('<new_description>'):
+            text = text[:-len('<new_description>')]
+        lines = re.split('<new_description>', text.strip())
+        texts = [line.replace('<new_description>', '').replace('\n', '').strip() for line in lines]
+        
+        for item in texts:
+            if 'new_description' in item:
+                raise ValueError("Invalid generation")
+        
+        descriptions_len = 4
+        if len(texts) != descriptions_len:
+            raise ValueError("Invalid generation")
+        
+        return texts
 
     def get_format_instructions(self) -> str:
         return "The answer should be in the form of a list, with each element separated by a line break."
@@ -106,7 +118,7 @@ def get_img(prompt):
 model_lite = GigaChat(
     credentials=GIGACHAT_CREDENTIALS, 
     model="GigaChat",
-    temperature=0.2,
+    top_p=0.6,
     verify_ssl_certs=False
 )
 
