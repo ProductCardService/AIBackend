@@ -18,7 +18,7 @@ app = FastAPI(title="Product Card Service App")
 @app.post("/generate/descriptions")
 async def get_descriptions(pinput: PredictionInput):
     title = pinput.title
-    num_attempts = 3
+    num_attempts = 5
     for _ in range(num_attempts):
         try:
             descriptions = description_chain.invoke({"title": title})

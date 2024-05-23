@@ -38,10 +38,13 @@ class NewlineOutputParser(BaseOutputParser):
         if text.endswith('<new_description>'):
             text = text[:-len('<new_description>')]
         lines = re.split('<new_description>', text.strip())
-        texts = [line.replace('<new_description>', '').replace('\n', '').strip() for line in lines]
+        texts = [
+            line.replace('<new_description>', '').replace('</new_description>', '').replace('\n', '').strip() 
+            for line in lines
+        ]
         
         for item in texts:
-            if 'new_description' in item:
+            if ('new_description' in item) or (not item):
                 raise ValueError("Invalid generation")
         
         descriptions_len = 4
@@ -131,7 +134,7 @@ model_pro = GigaChat(
 )
 
 tags_chain = TAGS_TEMPLATE | model_pro | parse | output_parser
-description_chain = DESCRIPTION_TEMPLATE | model_lite | new_line_output_parser
+description_chain = DESCRIPTION_TEMPLATE | model_pro | new_line_output_parser
 food_chain = (
     {'category': TRANSLATE_TEMPLATE | model_lite} 
     | FOOD_TEMPLATE 
