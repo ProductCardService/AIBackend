@@ -28,6 +28,7 @@ with open(prompts_path, "r", encoding='utf-8') as f:
 
 TAGS_TEMPLATE = PromptTemplate.from_template(prompts['tags'])
 DESCRIPTION_TEMPLATE = PromptTemplate.from_template(prompts['description'])
+TRANSLATE_TEMPLATE = PromptTemplate.from_template(prompts['translate'])
 FOOD_TEMPLATE = PromptTemplate.from_template(prompts['food'])
 IMAGE_TEMPLATE = PromptTemplate.from_template(prompts['image'])
 
@@ -74,7 +75,7 @@ class Text2ImageAPI:
         data = response.json()
         return data[0]['id']
 
-    def generate(self, prompt, model, images=1, width=1024, height=1024):
+    def generate(self, prompt, model, images=1, width=960, height=640):
         params = {
             "type": "GENERATE",
             "numImages": images,
@@ -125,11 +126,11 @@ model_lite = GigaChat(
 model_pro = GigaChat(
     credentials=GIGACHAT_CREDENTIALS, 
     model="GigaChat-Pro",
-    temperature=0.5,
+    top_p=0.9,
     verify_ssl_certs=False
 )
 
 tags_chain = TAGS_TEMPLATE | model_pro | parse | output_parser
 description_chain = DESCRIPTION_TEMPLATE | model_lite | new_line_output_parser
-food_chain = FOOD_TEMPLATE | model_lite | parse | output_parser
+food_chain = {'category': TRANSLATE_TEMPLATE | model_lite} | FOOD_TEMPLATE | model_lite | parse | output_parser
 image_chain = IMAGE_TEMPLATE | model_lite | get_img

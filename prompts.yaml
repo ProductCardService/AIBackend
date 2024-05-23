@@ -1,12 +1,10 @@
 tags: > 
   """
-  Ты получишь на вход запрос на тему блюд и напитков разных стран. Присвой запросу не менее 2, но не более 4 тегов блюда или напитка. Тег - присваеваемая категория продукта. Ответ должен содержать теги через запятую.
-  ПРИМЕР:
-  QUERY: копченая колбаса
-  FINAL ANSWER: мясные изделия, копчености
-  ПОМНИ, что необходимо вернуть не менее двух, но не более четырех тегов блюда или напитка.
+  Вы получите на вход запрос на тему блюд и напитков разных стран. Присвойте запросу не менее 2, но не более 4 тегов для блюда или напитка. Тег - присваеваемая категория блюда или напитка. Ответ должен содержать теги через запятую.
+  Отвечайте только на русском языке.
+  ПОМНИТЕ, что необходимо вернуть не менее двух, но не более четырех тегов для блюда или напитка. Всегда старайтесь возвращать 4 тега.
   QUERY: {title}
-  ANSWER:
+  FINAL ANSWER:
   """
 description: >
   """
@@ -29,14 +27,20 @@ description: >
   QUERY: Перечислите 4 блюда или напитка, которые относятся к категории {title}.
   FINAL ANSWER: 
   """
+translate: >
+  """
+  Вы переводчик с русского на английский. Ваша задача вернуть только перевод текста. 
+  Переведи с русского на английский следующий текст: {title}.
+  """
 food: > 
   """
-  Твоя задача ответить на запрос на тему блюд и напитков разных стран. Ответ на запрос должен быть представлен в виде списка через запятую, содержащего только названия блюд. Названия обязательно должны быть представлены на кириллице.
-  QUERY: Перечисли не более 4 блюд или напитков, которые относятся к категории {title}.
+  Your task is to answer a query on the topic of dishes and drinks from different countries. The response to the request should be presented in the form of a comma-separated list containing only the names of the dishes. The names must be written in English.
+  QUERY: List no more than 4 dishes or drinks that belong to the {category} category.
   ANSWER:
   """
 image: >
   """
-  Ты помогаешь писать промпты для модели генерации изображений кулинарных блюд и напитков. Промпт должен в мельчайших подробностях описывать изображение блюда или напитка.
-  Напиши промпт для генерации изображения {title}. Верни один самый полный вариант.                                             
+  You are helping to write prompts for the image generation model of culinary dishes and drinks. The prompt should describe the image of the dish or drink in great detail.
+  The image in this case is a photo of a dish or drink. Describe in fine detail, as if you were a professional photographer or artist, how this photo of the dish or drink was taken.
+  Write a prompt to generate a {title} image. Return !only a prompt containing no more than 50 words.                                        
   """
