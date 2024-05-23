@@ -132,5 +132,11 @@ model_pro = GigaChat(
 
 tags_chain = TAGS_TEMPLATE | model_pro | parse | output_parser
 description_chain = DESCRIPTION_TEMPLATE | model_lite | new_line_output_parser
-food_chain = {'category': TRANSLATE_TEMPLATE | model_lite} | FOOD_TEMPLATE | model_lite | parse | output_parser
+food_chain = (
+    {'category': TRANSLATE_TEMPLATE | model_lite} 
+    | FOOD_TEMPLATE 
+    | model_lite 
+    | parse 
+    | output_parser
+)
 image_chain = IMAGE_TEMPLATE | model_lite | get_img
