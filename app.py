@@ -14,19 +14,24 @@ class PredictionInput(BaseModel):
 
 app = FastAPI(title="Product Card Service App")
 
-
-@app.post("/generate/descriptions")
-async def get_descriptions(pinput: PredictionInput):
-    title = pinput.title
-    num_attempts = 5
+def retry(chain, body, num_attempts=5):
     for _ in range(num_attempts):
         try:
-            descriptions = description_chain.invoke({"title": title})
-            break
+            output = chain.invoke(body)
+            return output
         except Exception as e:
             pass
     else:
         raise Exception("All attempts failed to execute the code")
+
+
+@app.post("/generate/descriptions")
+async def get_descriptions(pinput: PredictionInput):
+    title = pinput.title
+    descriptions = retry(
+        chain=description_chain, 
+        body={"title": title}
+    )
 
     return {"descriptions": descriptions}
 
@@ -41,7 +46,10 @@ async def get_tags(pinput: PredictionInput):
 async def get_images(pinput: PredictionInput):
     title = pinput.title
     images = []
-    food_list = food_chain.invoke({"title": title})
+    food_list = retry(
+        chain=food_chain, 
+        body={"title": title}
+    )
     tasks = [image_chain.ainvoke({"title": food}) for food in food_list]    
     image_results = await asyncio.gather(*tasks)
     images.extend(image_results)
