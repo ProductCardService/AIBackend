@@ -124,7 +124,7 @@ def get_img(prompt):
     model_id = api.get_model()
     uuid = api.generate(prompt, model_id)
     images = api.check_generation(uuid)
-    image_base64 = images[0] 
+    image_base64 = "data:image/jpg;base64," + images[0] 
 
     return image_base64
 
