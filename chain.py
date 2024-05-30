@@ -60,6 +60,17 @@ def parse(ai_message: AIMessage) -> str:
     """Parse the AI message."""
     return ai_message.rstrip('.').lower()
 
+def check_list(data):
+    if isinstance(data, list):
+        for item in data:
+            if not isinstance(item, str):
+                raise ValueError("Invalid generation: list contains non-string elements")
+            if len(item) > 900:
+                raise ValueError("Invalid generation: string length exceeds 900 characters")
+        return data
+    else:
+        raise ValueError("Invalid generation: input is not a list")
+
 new_line_output_parser = NewlineOutputParser()
 output_parser = CommaSeparatedListOutputParser()
 
@@ -98,7 +109,7 @@ class Text2ImageAPI:
         data = response.json()
         return data['uuid']
 
-    def check_generation(self, request_id, attempts=10, delay=10):
+    def check_generation(self, request_id, attempts=100, delay=10):
         while attempts > 0:
             response = requests.get(self.URL + 'key/api/v1/text2image/status/' + request_id, headers=self.AUTH_HEADERS)
             data = response.json()
@@ -136,10 +147,10 @@ model_pro = GigaChat(
 tags_chain = TAGS_TEMPLATE | model_pro | parse | output_parser
 description_chain = DESCRIPTION_TEMPLATE | model_pro | new_line_output_parser
 food_chain = (
-    {'category': TRANSLATE_TEMPLATE | model_lite} 
-    | FOOD_TEMPLATE 
+    FOOD_TEMPLATE 
     | model_lite 
     | parse 
     | output_parser
+    | check_list
 )
 image_chain = IMAGE_TEMPLATE | model_lite | get_img
