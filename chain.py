@@ -28,7 +28,6 @@ with open(prompts_path, "r", encoding='utf-8') as f:
 
 TAGS_TEMPLATE = PromptTemplate.from_template(prompts['tags'])
 DESCRIPTION_TEMPLATE = PromptTemplate.from_template(prompts['description'])
-TRANSLATE_TEMPLATE = PromptTemplate.from_template(prompts['translate'])
 FOOD_TEMPLATE = PromptTemplate.from_template(prompts['food'])
 IMAGE_TEMPLATE = PromptTemplate.from_template(prompts['image'])
 
