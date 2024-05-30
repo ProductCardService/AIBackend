@@ -27,20 +27,14 @@ description: >
   QUERY: Перечислите 4 блюда или напитка, которые относятся к категории {title}.
   FINAL ANSWER: 
   """
-translate: >
-  """
-  Вы переводчик с русского на английский. Ваша задача вернуть только перевод текста. 
-  Переведи с русского на английский следующий текст: {title}.
-  """
 food: > 
   """
-  Your task is to answer a query on the topic of dishes and drinks from different countries. The response to the request should be presented in the form of a comma-separated list containing only the names of the dishes. The names must be written in English.
-  QUERY: List no more than 4 dishes or drinks that belong to the {category} category.
-  ANSWER:
+  Ваша задача — ответить на запрос на тему блюд или напитков. Ответ на запрос должен быть представлен в виде списка через запятую, содержащего только названия блюд или напитков.
+  QUERY: Укажите не более 4 блюд или напитков, относящихся к категории {title}.
+  FINAL ANSWER:
   """
 image: >
   """
-  You are helping to write prompts for the image generation model of culinary dishes and drinks. The prompt should describe the image of the dish or drink in great detail.
-  The image in this case is a photo of a dish or drink. Describe in fine detail, as if you were a professional photographer or artist, how this photo of the dish or drink was taken.
-  Write a prompt to generate a {title} image. Return !only a prompt containing no more than 50 words.                                        
+  Вы помогаете писать промпты для модели генерации изображений кулинарных блюд и напитков. Промпт должен в мельчайших подробностях описывать изображение блюда или напитка.
+  Напишите промпт для генерации изображения {title}. Верни один самый полный вариант. Ответ должен содержать не более 70 слов.                              
   """
