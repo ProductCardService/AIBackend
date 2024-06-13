@@ -4,6 +4,9 @@ import json
 import yaml
 import requests
 import re
+import logging
+import sys
+from fastapi import FastAPI, HTTPException
 
 from dotenv import load_dotenv
 
@@ -14,6 +17,8 @@ from langchain_community.llms import GigaChat
 from langchain.prompts import PromptTemplate
 
 load_dotenv()
+
+logging.basicConfig(level=logging.ERROR, stream=sys.stderr, format='%(asctime)s %(levelname)s %(message)s')
 
 GIGACHAT_CREDENTIALS = os.getenv("GIGACHAT_CREDENTIALS")
 KANDINSKY_API_KEY = os.getenv('KANDINSKY_API_KEY')
@@ -84,9 +89,14 @@ class Text2ImageAPI:
         }
 
     def get_model(self):
-        response = requests.get(self.URL + 'key/api/v1/models', headers=self.AUTH_HEADERS)
-        data = response.json()
-        return data[0]['id']
+        try:
+            response = requests.get(self.URL + 'key/api/v1/models', headers=self.AUTH_HEADERS)
+            data = response.json()
+            return data[0]['id']
+        except requests.exceptions.RequestException as e:
+            raise HTTPException(status_code=422, detail=f"Failed to get model: {e}")
+        except Exception as e:
+            logging.error(f"Failed to get model: {e}")
 
     def generate(self, prompt, model, images=1, width=960, height=640):
         params = {
@@ -104,29 +114,41 @@ class Text2ImageAPI:
             'model_id': (None, model),
             'params': (None, json.dumps(params), 'application/json')
         }
-        response = requests.post(self.URL + 'key/api/v1/text2image/run', headers=self.AUTH_HEADERS, files=data)
-        data = response.json()
-        return data['uuid']
+        try:
+            response = requests.post(self.URL + 'key/api/v1/text2image/run', headers=self.AUTH_HEADERS, files=data)
+            data = response.json()
+            return data['uuid']
+        except requests.exceptions.RequestException as e:
+            raise HTTPException(status_code=422, detail=f"Failed to generate image: {e}")
+        except Exception as e:
+            logging.error(f"Failed to generate image: {e}")
 
     def check_generation(self, request_id, attempts=100, delay=20):
-        while attempts > 0:
-            response = requests.get(self.URL + 'key/api/v1/text2image/status/' + request_id, headers=self.AUTH_HEADERS)
-            data = response.json()
-            if data['status'] == 'DONE':
-                return data['images']
+        try:
+            while attempts > 0:
+                response = requests.get(self.URL + 'key/api/v1/text2image/status/' + request_id, headers=self.AUTH_HEADERS)
+                data = response.json()
+                if data['status'] == 'DONE':
+                    return data['images']
 
-            attempts -= 1
-            time.sleep(delay)
-
+                attempts -= 1
+                time.sleep(delay)
+        except requests.exceptions.RequestException as e:
+            raise HTTPException(status_code=422, detail=f"Failed to check generation status: {e}")
+        except Exception as e:
+            logging.error(f"Failed to check generation status: {e}")
 
 def get_img(prompt):
-    api = Text2ImageAPI('https://api-key.fusionbrain.ai/', KANDINSKY_API_KEY, KANDINSKY_SECRET_KEY)
-    model_id = api.get_model()
-    uuid = api.generate(prompt, model_id)
-    images = api.check_generation(uuid)
-    image_base64 = "data:image/jpg;base64," + images[0] 
-
-    return image_base64
+    try:
+        api = Text2ImageAPI('https://api-key.fusionbrain.ai/', KANDINSKY_API_KEY, KANDINSKY_SECRET_KEY)
+        model_id = api.get_model()
+        uuid = api.generate(prompt, model_id)
+        images = api.check_generation(uuid)
+        image_base64 = "data:image/jpg;base64," + images[0] 
+        return image_base64
+    except Exception as e:
+        logging.error(f"System error: {e}")
+        raise HTTPException(status_code=422, detail=f"System error: {e}")
 
 
 model_lite = GigaChat(

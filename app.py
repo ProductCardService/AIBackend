@@ -1,5 +1,8 @@
+import sys
 import asyncio
-from fastapi import FastAPI
+import logging
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import JSONResponse
 from chain import (
     tags_chain, 
     description_chain, 
@@ -8,6 +11,8 @@ from chain import (
 )
 from pydantic import BaseModel
 
+
+logging.basicConfig(level=logging.ERROR, stream=sys.stderr, format='%(asctime)s %(levelname)s %(message)s')
 
 class PredictionInput(BaseModel):
     title: str
@@ -27,35 +32,49 @@ def retry(chain, body, num_attempts=5):
 
 @app.post("/generate/descriptions")
 async def get_descriptions(pinput: PredictionInput):
-    title = pinput.title
-    descriptions = retry(
-        chain=description_chain, 
-        body={"title": title}
-    )
-
-    return {"descriptions": descriptions}
+    try:
+        title = pinput.title
+        descriptions = retry(
+            chain=description_chain, 
+            body={"title": title}
+        )
+        return {"descriptions": descriptions}
+    except ValueError as e:
+        return JSONResponse(status_code=422, content={"message": f"Validation error: {e}"})
+    except Exception as e:
+        logging.error(f"System error: {e}")
+        return JSONResponse(status_code=422, content={"message": f"System error: {e}"})
 
 @app.post("/generate/tags")
 async def get_tags(pinput: PredictionInput):
-    title = pinput.title
-    tags = tags_chain.invoke({"title": title})
-
-    return {"tags": tags}
+    try:
+        title = pinput.title
+        tags = tags_chain.invoke({"title": title})
+        return {"tags": tags}
+    except ValueError as e:
+        return JSONResponse(status_code=422, content={"message": f"Validation error: {e}"})
+    except Exception as e:
+        logging.error(f"System error: {e}")
+        return JSONResponse(status_code=422, content={"message": f"System error: {e}"})
 
 @app.post("/generate/images")
 async def get_images(pinput: PredictionInput):
-    title = pinput.title
-    images = []
-    food_list = retry(
-        chain=food_chain, 
-        body={"title": title}
-    )
-    tasks = [image_chain.ainvoke({"title": food}) for food in food_list]    
-    image_results = await asyncio.gather(*tasks)
-    images.extend(image_results)
-
-    return {"images": images}
-
+    try:
+        title = pinput.title
+        images = []
+        food_list = retry(
+            chain=food_chain, 
+            body={"title": title}
+        )
+        tasks = [image_chain.ainvoke({"title": food}) for food in food_list]    
+        image_results = await asyncio.gather(*tasks)
+        images.extend(image_results)
+        return {"images": images}
+    except ValueError as e:
+        return JSONResponse(status_code=422, content={"message": f"Validation error: {e}"})
+    except Exception as e:
+        logging.error(f"System error: {e}")
+        return JSONResponse(status_code=500, content={"message": f"System error: {e}"})
 
 if __name__ == "__main__":
     import uvicorn
