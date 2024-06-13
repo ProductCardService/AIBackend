@@ -74,7 +74,7 @@ async def get_images(pinput: PredictionInput):
         return JSONResponse(status_code=422, content={"message": f"Validation error: {e}"})
     except Exception as e:
         logging.error(f"System error: {e}")
-        return JSONResponse(status_code=500, content={"message": f"System error: {e}"})
+        return JSONResponse(status_code=422, content={"message": f"System error: {e}"})
 
 if __name__ == "__main__":
     import uvicorn
